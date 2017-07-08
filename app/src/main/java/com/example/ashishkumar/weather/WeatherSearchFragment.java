@@ -34,13 +34,13 @@ import static com.example.ashishkumar.weather.Constants.SHARED_PREF_FILE_NAME;
  */
 
 public class WeatherSearchFragment extends Fragment implements View.OnClickListener {
+    View mDetailsView;
     private String LOG_TAG = WeatherSearchFragment.class.getSimpleName();
     private EditText mSearchEditText;
     private TextView mCityTv;
     private TextView mTempTv;
     private TextView mConditionTv;
     private ImageView mConditionImageView;
-    View mDetailsView;
 
     public static WeatherSearchFragment newInstance() {
         WeatherSearchFragment fragment = new WeatherSearchFragment();
@@ -56,8 +56,10 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
         Button searchButton = (Button) view.findViewById(R.id.search_button);
         mCityTv = (TextView) view.findViewById(R.id.city);
         String savedCity = getSavedCity();
+        //set the last displayed city and call the service to fetch the current data
         if (!TextUtils.isEmpty(savedCity)) {
             mSearchEditText.setText(savedCity);
+            mSearchEditText.setSelection(savedCity.length());
             new WeatherDetailsFetchAsyncTask().execute(getUserInput());
         }
         mTempTv = (TextView) view.findViewById(R.id.temp);
@@ -138,7 +140,7 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
                 //save city to shared pref and display data to UI
                 if (weatherDetailsResponse != null) {
                     saveSearchedCity(weatherDetailsResponse.getName());
-                    if (weatherDetailsResponse != null && weatherDetailsResponse.getWeather() != null && weatherDetailsResponse.getWeather().get(0) != null) {
+                    if (weatherDetailsResponse.getWeather() != null && weatherDetailsResponse.getWeather().get(0) != null) {
                         mConditionTv.setText(weatherDetailsResponse.getWeather().get(0).getMain());
                         new WeatherIconFetchAsyncTask().execute(weatherDetailsResponse.getWeather().get(0).getIcon());
                     }
