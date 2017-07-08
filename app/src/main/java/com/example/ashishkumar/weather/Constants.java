@@ -15,9 +15,8 @@ public class Constants {
 
     public final static String WEATHER_SEARCH_EMPTY_MESSAGE = "No Data Found";
     public final static String SERVER_ERROR = "Network Issue";
+    public final static String WEATHER_ICON_FETCH_ERROR = "Could not retrieve weather condition image";
     public final static String NO_USER_INPUT_MESSAGE = "Please enter some city";
-
-    public static final String BUNDLE_EXTRA_WEATHER_DETAILS = "weather_details";
 
     public static final String SHARED_PREF_FILE_NAME = "com.example.ashishkumar.weather.PREFERENCE_FILE_KEY";
     public static final String SHARED_PREF_CITY_KEY = "city";

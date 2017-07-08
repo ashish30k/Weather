@@ -4,4 +4,6 @@
     <string name="search_city_hint">Enter City</string>
     <string name="search_screen_title">Search</string>
     <string name="fahrenheit">\u2109</string>
+    <string name="loading">Loading</string>
+    <string name="non_us_city_error_messgage">The City you searched for is not in the US</string>
 </resources>

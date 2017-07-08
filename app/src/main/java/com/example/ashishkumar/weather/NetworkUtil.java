@@ -15,19 +15,20 @@ import javax.net.ssl.HttpsURLConnection;
 import static com.example.ashishkumar.weather.Constants.APP_ID_PARAM;
 import static com.example.ashishkumar.weather.Constants.APP_ID_PARAM_VALUE;
 import static com.example.ashishkumar.weather.Constants.SERVER_ERROR;
+import static com.example.ashishkumar.weather.Constants.WEATHER_ICON_FETCH_ERROR;
 import static com.example.ashishkumar.weather.Constants.WEATHER_SEARCH_EMPTY_MESSAGE;
 
 /**
  * Created by ashishkumar on 7/7/17.
+ * References https://developer.android.com/training/basics/network-ops/connecting.html
  */
 
 public class NetworkUtil {
-    private String LOG_TAG = NetworkUtil.class.getSimpleName();
+    private final String LOG_TAG = NetworkUtil.class.getSimpleName();
 
     public String fetchWeatherDetails(final String url, String city) throws IOException {
         String modifiedUrl = url + "?q=" + city + "&" + APP_ID_PARAM + "=" + APP_ID_PARAM_VALUE;
         Log.d(LOG_TAG, "modifiedUrl :: " + modifiedUrl);
-
 
         InputStream stream = null;
         HttpURLConnection connection = null;
@@ -77,7 +78,7 @@ public class NetworkUtil {
             int responseCode = connection.getResponseCode();
 
             if (responseCode != HttpsURLConnection.HTTP_OK) {
-                throw new IOException(SERVER_ERROR);
+                throw new IOException(WEATHER_ICON_FETCH_ERROR);
             }
             stream = connection.getInputStream();
             bitmap = BitmapFactory.decodeStream(stream);

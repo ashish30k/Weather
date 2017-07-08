@@ -1,5 +1,6 @@
 package com.example.ashishkumar.weather;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -34,8 +35,9 @@ import static com.example.ashishkumar.weather.Constants.SHARED_PREF_FILE_NAME;
  */
 
 public class WeatherSearchFragment extends Fragment implements View.OnClickListener {
+    private final String LOG_TAG = WeatherSearchFragment.class.getSimpleName();
     View mDetailsView;
-    private String LOG_TAG = WeatherSearchFragment.class.getSimpleName();
+    ProgressDialog mProgressDialog;
     private EditText mSearchEditText;
     private TextView mCityTv;
     private TextView mTempTv;
@@ -78,9 +80,10 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.search_button) {
+            //hide the keyboard
             ((WeatherSearchActivity) getActivity()).hideKeyboard(v);
             if (TextUtils.isEmpty(getUserInput())) {
-                Toast.makeText(getContext(), NO_USER_INPUT_MESSAGE, Toast.LENGTH_LONG).show();
+                displayToast(NO_USER_INPUT_MESSAGE);
             } else {
                 new WeatherDetailsFetchAsyncTask().execute(getUserInput());
             }
@@ -109,9 +112,26 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
         return sharedPreferences.getString(SHARED_PREF_CITY_KEY, "");
     }
 
+    private void displayToast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    //set the visibility to gone and dismiss the dialog
+    private void resetUIOnError() {
+        mDetailsView.setVisibility(View.GONE);
+        mProgressDialog.dismiss();
+    }
 
     private class WeatherDetailsFetchAsyncTask extends AsyncTask<String, String, WeatherDetailsResponse> {
-        String errorMessage;
+        private String errorMessage;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog = ProgressDialog.show(getContext(), "",
+                    getString(R.string.loading), true);
+            mProgressDialog.setCancelable(false);
+        }
 
         @Override
         protected WeatherDetailsResponse doInBackground(String... params) {
@@ -120,11 +140,10 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
             try {
                 response = new NetworkUtil().fetchWeatherDetails(BASE_WEATHER_URL, params[0]);
                 weatherDetailsResponse = WeatherDetailsResponse.parseJSON(response);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 errorMessage = e.getMessage();
                 Log.e(LOG_TAG, e.getMessage(), e);
             }
-
             return weatherDetailsResponse;
         }
 
@@ -132,14 +151,18 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
         protected void onPostExecute(WeatherDetailsResponse weatherDetailsResponse) {
             super.onPostExecute(weatherDetailsResponse);
             if (!TextUtils.isEmpty(errorMessage)) {
-                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
-                //hide the visibility
-                mDetailsView.setVisibility(View.GONE);
-
+                displayToast(errorMessage);
+                resetUIOnError();
             } else {
-                //save city to shared pref and display data to UI
-                if (weatherDetailsResponse != null) {
+                //if the returned weather place's country is other than US then simply display Toast message
+                if (!weatherDetailsResponse.getSys().getCountry().equalsIgnoreCase("US")) {
+                    displayToast(getString(R.string.non_us_city_error_messgage));
+                    resetUIOnError();
+                } else {
+                    //save city to the shared pref and display data to UI
                     saveSearchedCity(weatherDetailsResponse.getName());
+                    //setting the city name to the edittext
+                    mSearchEditText.setText(weatherDetailsResponse.getName());
                     if (weatherDetailsResponse.getWeather() != null && weatherDetailsResponse.getWeather().get(0) != null) {
                         mConditionTv.setText(weatherDetailsResponse.getWeather().get(0).getMain());
                         new WeatherIconFetchAsyncTask().execute(weatherDetailsResponse.getWeather().get(0).getIcon());
@@ -147,35 +170,36 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
                     mCityTv.setText(weatherDetailsResponse.getName());
                     double fahrenheit = convertKelvinToFahrenheit(weatherDetailsResponse.getMain().getTemp());
                     mTempTv.setText(new DecimalFormat("#").format(fahrenheit) + getString(R.string.fahrenheit));
-                    //now make all UI elements visible
-                    mDetailsView.setVisibility(View.VISIBLE);
                 }
             }
         }
-    }
 
-    private class WeatherIconFetchAsyncTask extends AsyncTask<String, String, Bitmap> {
-        String errorMessage;
+        private class WeatherIconFetchAsyncTask extends AsyncTask<String, String, Bitmap> {
+            private String errorMessage;
 
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            Bitmap bitmap = null;
-            try {
-                bitmap = new NetworkUtil().downloadWeatherConditionsIcon(BASE_WEATHER_ICON_URL, params[0]);
-            } catch (IOException e) {
-                errorMessage = e.getMessage();
-                Log.e(LOG_TAG, e.getMessage(), e);
+            @Override
+            protected Bitmap doInBackground(String... params) {
+                Bitmap bitmap = null;
+                try {
+                    bitmap = new NetworkUtil().downloadWeatherConditionsIcon(BASE_WEATHER_ICON_URL, params[0]);
+                } catch (IOException e) {
+                    errorMessage = e.getMessage();
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                }
+                return bitmap;
             }
-            return bitmap;
-        }
 
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            if (!TextUtils.isEmpty(errorMessage)) {
-                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
-            } else if (bitmap != null) {
-                mConditionImageView.setImageBitmap(bitmap);
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                super.onPostExecute(bitmap);
+                mProgressDialog.dismiss();
+                if (!TextUtils.isEmpty(errorMessage)) {
+                    displayToast(errorMessage);
+                } else if (bitmap != null) {
+                    mConditionImageView.setImageBitmap(bitmap);
+                    //now make all UI elements for weather details visible
+                    mDetailsView.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
