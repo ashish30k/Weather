@@ -118,6 +118,8 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
 
     //set the visibility to gone and dismiss the dialog
     private void resetUIOnError() {
+        //set the bitmap to null
+        mConditionImageView.setImageBitmap(null);
         mDetailsView.setVisibility(View.GONE);
         mProgressDialog.dismiss();
     }
