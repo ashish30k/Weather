@@ -7,7 +7,6 @@ package com.example.ashishkumar.weather;
 public class Constants {
     //constants for Fragments tags
     public final static String FRAGMENT_TAG_WEATHER_SEARCH = "FRAGMENT_WEATHER_SEARCH";
-    public final static String FRAGMENT_TAG_WEATHER_DETAILS = "FRAGMENT_WEATHER_DETAILS";
 
     public final static String BASE_WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather";
     public final static String BASE_WEATHER_ICON_URL = "http://openweathermap.org/img/w/";

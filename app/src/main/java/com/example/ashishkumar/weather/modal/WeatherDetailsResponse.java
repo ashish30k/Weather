@@ -4,15 +4,26 @@ package com.example.ashishkumar.weather.modal;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class WeatherDetailsResponse implements Parcelable {
 
+    public static final Creator<WeatherDetailsResponse> CREATOR = new Creator<WeatherDetailsResponse>() {
+        @Override
+        public WeatherDetailsResponse createFromParcel(Parcel in) {
+            return new WeatherDetailsResponse(in);
+        }
+
+        @Override
+        public WeatherDetailsResponse[] newArray(int size) {
+            return new WeatherDetailsResponse[size];
+        }
+    };
     @SerializedName("coord")
     @Expose
     private Coord coord;
@@ -59,6 +70,11 @@ public class WeatherDetailsResponse implements Parcelable {
         cod = in.readInt();
     }
 
+    public static WeatherDetailsResponse parseJSON(String response) {
+        Gson gson = new GsonBuilder().create();
+        return gson.fromJson(response, WeatherDetailsResponse.class);
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(base);
@@ -73,18 +89,6 @@ public class WeatherDetailsResponse implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Creator<WeatherDetailsResponse> CREATOR = new Creator<WeatherDetailsResponse>() {
-        @Override
-        public WeatherDetailsResponse createFromParcel(Parcel in) {
-            return new WeatherDetailsResponse(in);
-        }
-
-        @Override
-        public WeatherDetailsResponse[] newArray(int size) {
-            return new WeatherDetailsResponse[size];
-        }
-    };
 
     public Coord getCoord() {
         return coord;
@@ -180,12 +184,6 @@ public class WeatherDetailsResponse implements Parcelable {
 
     public void setCod(int cod) {
         this.cod = cod;
-    }
-
-    public static WeatherDetailsResponse parseJSON(String response) {
-        Gson gson = new GsonBuilder().create();
-        WeatherDetailsResponse boxOfficeMovieResponse = gson.fromJson(response, WeatherDetailsResponse.class);
-        return boxOfficeMovieResponse;
     }
 
 }

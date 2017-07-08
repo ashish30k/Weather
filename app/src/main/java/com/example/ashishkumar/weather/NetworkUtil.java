@@ -39,8 +39,6 @@ public class NetworkUtil {
             connection.connect();
             int responseCode = connection.getResponseCode();
 
-            //Given the time I would have handled error conditions as well as normal response using different callback methods.
-            //Because of time constraint simply throwing exception in case error happens.
             if (responseCode != HttpsURLConnection.HTTP_OK) {
                 if (responseCode == HttpsURLConnection.HTTP_NOT_FOUND) {
                     throw new IOException(WEATHER_SEARCH_EMPTY_MESSAGE);
@@ -68,7 +66,6 @@ public class NetworkUtil {
         String modifiedUrl = url + iconID + ".png";
         Log.d(LOG_TAG, "modifiedUrl :: " + modifiedUrl);
 
-
         InputStream stream = null;
         HttpURLConnection connection = null;
         Bitmap bitmap = null;
@@ -79,8 +76,6 @@ public class NetworkUtil {
             connection.connect();
             int responseCode = connection.getResponseCode();
 
-            //Given the time I would have handled error conditions as well as normal response using different callback methods.
-            //Because of time constraint simply throwing exception in case error happens.
             if (responseCode != HttpsURLConnection.HTTP_OK) {
                 throw new IOException(SERVER_ERROR);
             }

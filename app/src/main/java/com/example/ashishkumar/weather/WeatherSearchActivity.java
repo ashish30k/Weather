@@ -1,17 +1,12 @@
 package com.example.ashishkumar.weather;
 
-import android.support.v4.app.Fragment;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import com.example.ashishkumar.weather.modal.WeatherDetailsResponse;
-
-import static com.example.ashishkumar.weather.Constants.BUNDLE_EXTRA_WEATHER_DETAILS;
-import static com.example.ashishkumar.weather.Constants.FRAGMENT_TAG_WEATHER_DETAILS;
 import static com.example.ashishkumar.weather.Constants.FRAGMENT_TAG_WEATHER_SEARCH;
 
 public class WeatherSearchActivity extends AppCompatActivity {
