@@ -71,7 +71,9 @@ public class WeatherDetailsResponse implements Parcelable {
     }
 
     public static WeatherDetailsResponse parseJSON(String response) {
-        Gson gson = new GsonBuilder().create();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setLenient();
+        Gson gson = gsonBuilder.create();
         return gson.fromJson(response, WeatherDetailsResponse.class);
     }
 

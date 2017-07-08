@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,7 +21,6 @@ import static com.example.ashishkumar.weather.Constants.WEATHER_SEARCH_EMPTY_MES
 
 /**
  * Created by ashishkumar on 7/7/17.
- * References https://developer.android.com/training/basics/network-ops/connecting.html
  */
 
 public class NetworkUtil {
@@ -49,7 +49,7 @@ public class NetworkUtil {
             }
             stream = connection.getInputStream();
             if (stream != null) {
-                result = readStream(stream, 500);
+                result = readStream(stream);
             }
         } finally {
             if (stream != null) {
@@ -94,20 +94,28 @@ public class NetworkUtil {
         return bitmap;
     }
 
-    private String readStream(InputStream stream, int maxLength) throws IOException {
-        String result = null;
-        InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[maxLength];
-        int numberOfChars = 0;
-        int readSize = 0;
-        while (numberOfChars < maxLength && readSize != -1) {
-            numberOfChars += readSize;
-            readSize = reader.read(buffer, numberOfChars, buffer.length - numberOfChars);
+    private String readStream(InputStream stream) throws IOException {
+        if (stream != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            StringBuilder builder = new StringBuilder();
+
+            try {
+                String line = reader.readLine();
+                while (line != null) {
+                    builder.append(line);
+                    line = reader.readLine();
+                }
+
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+
+                }
+            }
+            return new String(builder);
+        } else {
+            return null;
         }
-        if (numberOfChars != -1) {
-            numberOfChars = Math.min(numberOfChars, maxLength);
-            result = new String(buffer, 0, numberOfChars);
-        }
-        return result;
     }
 }

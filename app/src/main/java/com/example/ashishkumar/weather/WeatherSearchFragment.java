@@ -27,6 +27,7 @@ import java.text.DecimalFormat;
 import static com.example.ashishkumar.weather.Constants.BASE_WEATHER_ICON_URL;
 import static com.example.ashishkumar.weather.Constants.BASE_WEATHER_URL;
 import static com.example.ashishkumar.weather.Constants.NO_USER_INPUT_MESSAGE;
+import static com.example.ashishkumar.weather.Constants.SERVER_ERROR;
 import static com.example.ashishkumar.weather.Constants.SHARED_PREF_CITY_KEY;
 import static com.example.ashishkumar.weather.Constants.SHARED_PREF_FILE_NAME;
 
@@ -139,7 +140,9 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
             WeatherDetailsResponse weatherDetailsResponse = null;
             try {
                 String response = new NetworkUtil().fetchWeatherDetails(BASE_WEATHER_URL, params[0]);
-                weatherDetailsResponse = WeatherDetailsResponse.parseJSON(response);
+                if (response != null) {
+                    weatherDetailsResponse = WeatherDetailsResponse.parseJSON(response);
+                }
             } catch (Exception e) {
                 errorMessage = e.getMessage();
                 Log.e(LOG_TAG, e.getMessage(), e);
@@ -155,24 +158,29 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
                 resetUIOnError();
             } else {
                 //if the returned weather place's country is other than US then simply display Toast message
-                if (!weatherDetailsResponse.getSys().getCountry().equalsIgnoreCase("US")) {
-                    displayToast(getString(R.string.non_us_city_error_messgage));
-                    resetUIOnError();
-                } else {
-                    //save city to the shared pref and display data to UI
-                    saveSearchedCity(weatherDetailsResponse.getName());
-                    //setting the city name to the edit text
-                    mSearchEditText.setText(weatherDetailsResponse.getName());
-                    mSearchEditText.setSelection(weatherDetailsResponse.getName().length());
+                if (weatherDetailsResponse != null) {
+                    if (!weatherDetailsResponse.getSys().getCountry().equalsIgnoreCase("US")) {
+                        displayToast(getString(R.string.non_us_city_error_messgage));
+                        resetUIOnError();
+                    } else {
+                        //save city to the shared pref and display data to UI
+                        saveSearchedCity(weatherDetailsResponse.getName());
+                        //setting the city name to the edit text
+                        mSearchEditText.setText(weatherDetailsResponse.getName());
+                        mSearchEditText.setSelection(weatherDetailsResponse.getName().length());
 
-                    if (weatherDetailsResponse.getWeather() != null && weatherDetailsResponse.getWeather().get(0) != null) {
-                        mConditionTv.setText(weatherDetailsResponse.getWeather().get(0).getMain());
-                        new WeatherIconFetchAsyncTask().execute(weatherDetailsResponse.getWeather().get(0).getIcon());
+                        if (weatherDetailsResponse.getWeather() != null && weatherDetailsResponse.getWeather().get(0) != null) {
+                            mConditionTv.setText(weatherDetailsResponse.getWeather().get(0).getMain());
+                            new WeatherIconFetchAsyncTask().execute(weatherDetailsResponse.getWeather().get(0).getIcon());
+                        }
+                        mCityTv.setText(weatherDetailsResponse.getName());
+                        double fahrenheit = convertKelvinToFahrenheit(weatherDetailsResponse.getMain().getTemp());
+                        mTempTv.setText(new DecimalFormat("#").format(fahrenheit) + getString(R.string.fahrenheit));
                     }
-                    mCityTv.setText(weatherDetailsResponse.getName());
-                    double fahrenheit = convertKelvinToFahrenheit(weatherDetailsResponse.getMain().getTemp());
-                    mTempTv.setText(new DecimalFormat("#").format(fahrenheit) + getString(R.string.fahrenheit));
+                } else {
+                    displayToast(SERVER_ERROR);
                 }
+
             }
         }
 
