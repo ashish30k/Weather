@@ -45,8 +45,7 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
     private ImageView mConditionImageView;
 
     public static WeatherSearchFragment newInstance() {
-        WeatherSearchFragment fragment = new WeatherSearchFragment();
-        return fragment;
+        return new WeatherSearchFragment();
     }
 
     @Nullable
