@@ -137,10 +137,9 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
 
         @Override
         protected WeatherDetailsResponse doInBackground(String... params) {
-            String response;
             WeatherDetailsResponse weatherDetailsResponse = null;
             try {
-                response = new NetworkUtil().fetchWeatherDetails(BASE_WEATHER_URL, params[0]);
+                String response = new NetworkUtil().fetchWeatherDetails(BASE_WEATHER_URL, params[0]);
                 weatherDetailsResponse = WeatherDetailsResponse.parseJSON(response);
             } catch (Exception e) {
                 errorMessage = e.getMessage();
