@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Weather</string>
+    <string name="search">Search</string>
+    <string name="search_city_hint">Enter City</string>
+    <string name="search_screen_title">Search</string>
+    <string name="fahrenheit">\u2109</string>
+</resources>
