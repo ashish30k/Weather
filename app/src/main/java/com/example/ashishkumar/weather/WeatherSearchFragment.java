@@ -161,8 +161,10 @@ public class WeatherSearchFragment extends Fragment implements View.OnClickListe
                 } else {
                     //save city to the shared pref and display data to UI
                     saveSearchedCity(weatherDetailsResponse.getName());
-                    //setting the city name to the edittext
+                    //setting the city name to the edit text
                     mSearchEditText.setText(weatherDetailsResponse.getName());
+                    mSearchEditText.setSelection(weatherDetailsResponse.getName().length());
+
                     if (weatherDetailsResponse.getWeather() != null && weatherDetailsResponse.getWeather().get(0) != null) {
                         mConditionTv.setText(weatherDetailsResponse.getWeather().get(0).getMain());
                         new WeatherIconFetchAsyncTask().execute(weatherDetailsResponse.getWeather().get(0).getIcon());
